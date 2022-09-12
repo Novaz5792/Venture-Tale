@@ -238,15 +238,15 @@ section1:AddToggle({
     Flag = "Replay", 
     Callback = function(state)
         lopq = state
-        while lopq and task.wait() do 
-            pcall(function() 
-	    	if plr.PlayerGui:FindFirstChild("DungeonClear") and plr.PlayerGui.DungeonClear:FindFirstChild("DungeonClearLabel") and plr.PlayerGui.DungeonClear.DungeonClearLabel.Visible then 
-		    game.ReplicatedStorage.UI.EndDungeon.EndOfDungeonVote:FireServer("ReplayDungeon")
-		end
-            end)
-        end 
     end 
 })
+
+plr.PlayerGui.DungeonClear.DungeonClearLabel:GetPropertyChangedSignal("Visible"):Connect(function()
+    if lopq then 
+        wait(5)
+        game.ReplicatedStorage.UI.EndDungeon.EndOfDungeonVote:FireServer("ReplayDungeon")
+    end 
+end)
 
 section1:AddToggle({
     Name = "Enable DMG Multi?",
