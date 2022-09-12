@@ -240,7 +240,9 @@ section1:AddToggle({
         lopq = state
         while lopq and task.wait() do 
             pcall(function() 
-                firesignal(plr.PlayerGui.DungeonClear.Buttons.ButtonFrame.ReplayDungeon.MouseButton1Click)
+	    	if plr.PlayerGui.DungeonClear.DungeonClearLabel.Visible then 
+		    game.ReplicatedStorage.UI.EndDungeon.EndOfDungeonVote:FireServer("ReplayDungeon")
+		end
             end)
         end 
     end 
