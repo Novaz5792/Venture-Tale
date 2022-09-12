@@ -201,6 +201,22 @@ section1:AddToggle({
 })
 
 section1:AddToggle({
+    Name = "Remove Props", 
+    Value = false, 
+    Flag = "Props",
+    Callback = function(state)
+        pq = state 
+        while pq and task.wait() do 
+            for i,v in pairs(game.Workspace.Map:GetChildren()) do 
+                if v.Name == "Segments" then 
+                    v:Destroy()
+                end 
+            end 
+        end 
+    end
+})
+
+section1:AddToggle({
     Name = "Auto Open Gates",
     Value = false, 
     Flag = "Gates", 
