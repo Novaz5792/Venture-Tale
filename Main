@@ -29,7 +29,7 @@ local pathing = loadstring(game:HttpGet('https://raw.githubusercontent.com/V3N0M
 local charpathing = pathing.new(cha, {
     TIME_VARIANCE = 0.01, 
     COMPARISON_CHECKS = 2, 
-    JUMP_WHEN_STUCK = false
+    JUMP_WHEN_STUCK = true
 })
 
 plr.CharacterAdded:Connect(function(character)
@@ -39,7 +39,7 @@ plr.CharacterAdded:Connect(function(character)
     charpathing = pathing.new(cha, {
         TIME_VARIANCE = 0.01, 
         COMPARISON_CHECKS = 2, 
-        JUMP_WHEN_STUCK = false
+        JUMP_WHEN_STUCK = true
     })
 end)
 
