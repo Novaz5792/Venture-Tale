@@ -1,0 +1,410 @@
+local lib = loadstring(game:GetObjects("rbxassetid://7657867786")[1].Source)()
+local wait = lib.subs.Wait 
+local plr = game.Players.LocalPlayer
+local cha = plr.Character or plr.CharacterAdded:Wait()
+local hrp = cha:WaitForChild("HumanoidRootPart")
+local hum = cha:WaitForChild("Humanoid")
+local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+local request = http_request or request or HttpPost or syn.request
+
+for i,v in pairs(game.Workspace:GetDescendants()) do 
+    if v.Name == "Barricades" then 
+        v:Destroy()
+    end 
+end 
+
+local pathing = loadstring(game:HttpGet('https://raw.githubusercontent.com/V3N0M-Z/RBLX-SimplePath/main/src/SimplePath.lua'))()
+
+local charpathing = pathing.new(cha, {
+    TIME_VARIANCE = 0.01, 
+    COMPARISON_CHECKS = 2, 
+    JUMP_WHEN_STUCK = false
+})
+
+plr.CharacterAdded:Connect(function(character)
+    cha = character 
+    hrp = cha:WaitForChild("HumanoidRootPart")
+    hum = cha:WaitForChild("Humanoid")
+    charpathing = pathing.new(cha, {
+        TIME_VARIANCE = 0.01, 
+        COMPARISON_CHECKS = 2, 
+        JUMP_WHEN_STUCK = false
+    })
+end)
+
+local function pathfind(ENDPOS)
+    local Path = game:GetService("PathfindingService"):CreatePath(); Path:ComputeAsync(hrp.Position, ENDPOS)
+    hum.WalkSpeed = 16 
+    if Path.Status == Enum.PathStatus.Success then 
+        local wp = Path:GetWaypoints()
+        for i = 1,#wp do
+            local point = wp[i]; hum:MoveTo(point.Position); local success = hum.MoveToFinished:Wait()
+            if point.Action == Enum.PathWaypointAction.Jump then
+                hum.WalkSpeed = 0; wait(.2); hum.WalkSpeed = 16; hum.Jump = true
+            end
+            if not success then
+            hum.Jump = true; hum:MoveTo(point.Position)
+            if not hum.MoveToFinished:Wait() then
+                break
+            end
+        end
+    end
+end
+end 
+
+local showfov = Drawing.new("Circle")
+showfov.Thickness = 1 
+showfov.NumSides = 100 
+showfov.Radius = 180
+showfov.Filled = false 
+showfov.Color = Color3.fromRGB(0, 255, 0)
+showfov.Visible = false
+showfov.Transparency = 0.6
+
+local window = lib:CreateWindow({
+    Name = "Novaz#5792",
+    Themeable = {
+        Info = "Kalas A Skid",
+        Credit = false, 
+        Background = "",
+        Visible = true
+    }
+})
+
+local main1 = window:CreateTab({
+    Name = "Main"
+})
+
+local section1 = main1:CreateSection({
+    Name = "Main"
+})
+
+local section3 = main1:CreateSection({
+    Name = "Misc",
+    Side = "Right"
+})
+
+local section2 = main1:CreateSection({
+    Name = "Settings",
+    Side = "Right"
+})
+
+local pers = section2:AddPersistence({
+    Name = "Load/Save Config"
+})
+
+local function getclosestenemy()
+    local closest = nil 
+    local maxdist = math.huge
+    for i,v in pairs(game.Workspace.NPCS:GetChildren()) do 
+        if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
+            local magnitude = (v.HumanoidRootPart.Position - hrp.Position).Magnitude 
+            if magnitude < maxdist then 
+                maxdist = magnitude 
+                closest = v 
+            end 
+        end 
+    end 
+    return closest 
+end 
+
+local function getclosestenemytomouse(FOV)
+    local closest = nil 
+    local maxdist = math.huge
+    for i,v in pairs(game.Workspace.NPCS:GetChildren()) do 
+        if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
+            local screenpoint, onscreen = game.Workspace.CurrentCamera:WorldToScreenPoint(v.HumanoidRootPart.Position)
+            if onscreen then 
+                local magnitude = (Vector2.new(plr:GetMouse().X, plr:GetMouse().Y) - Vector2.new(screenpoint.X, screenpoint.Y)).Magnitude
+                if magnitude < maxdist and magnitude < FOV then 
+                    maxdist = magnitude 
+                    closest = v.HumanoidRootPart.Position
+                end 
+            end 
+        end 
+    end 
+    return closest 
+end 
+
+local function getallnearby()
+    local table1 = {}
+    for i,v in pairs(game.Workspace.NPCS:GetChildren()) do 
+        if (not string.find(v.Name, "God")) and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
+            local magnitude = (v.HumanoidRootPart.Position - hrp.Position).Magnitude 
+            if magnitude < (q or 15) then 
+                for i = 1, (amount1 or 1) do 
+                    table.insert(table1, {["KnockbackDirection"] = Vector3.new(0,0,0), ["TargetCharacter"] = v})
+                end
+            end 
+        end 
+    end
+    return table1
+end 
+
+local function getweapon()
+    for i,v in pairs(plr.stats.Equipped:GetChildren()) do 
+        if v.Name == "Wep1" and v:FindFirstChild("ItemID") then 
+            return v.ItemID.Value
+        end 
+    end 
+end 
+
+local function getweaponatkspeed(weapon)
+    for i,v in pairs(game:GetService("ReplicatedStorage").ItemData:GetChildren()) do 
+        if v:FindFirstChild(weapon) and v:FindFirstChild(weapon):FindFirstChild("AttackSpeed") then 
+            return tonumber(v:FindFirstChild(weapon).AttackSpeed.Value)
+        end 
+    end 
+end
+
+section1:AddToggle({
+    Name = "Auto Farm (Bad Unless AFK)",
+    Value = false, 
+    Flag = "Auto",
+    Callback = function(state)
+        lo = state 
+        while lo and task.wait(1) do 
+            pcall(function()
+                if getclosestenemy() and getclosestenemy():FindFirstChild("HumanoidRootPart") then 
+                    game:GetService("TweenService"):Create(hrp, TweenInfo.new((getclosestenemy().HumanoidRootPart.Position - hrp.Position).Magnitude / 10, Enum.EasingStyle.Linear), {CFrame = getclosestenemy().HumanoidRootPart.CFrame + Vector3.new(0, 4, 0)}):Play()
+                end 
+            end)
+        end 
+    end 
+})
+
+section1:AddToggle({
+    Name = "Pathfinding AutoFarm (Bad)",
+    Value = false, 
+    Flag = "PATH",
+    Callback = function(state)
+        qt = state 
+        while qt and task.wait() do 
+            pcall(function()
+                if getclosestenemy() and getclosestenemy():FindFirstChild("HumanoidRootPart") then 
+                    charpathing:Run(getclosestenemy().HumanoidRootPart.Position + getclosestenemy().HumanoidRootPart.CFrame.lookVector * -3)
+                end
+            end)
+        end 
+    end 
+})
+
+section1:AddToggle({
+    Name = "Auto Open Gates",
+    Value = false, 
+    Flag = "Gates", 
+    Callback = function(state)
+        loqp = state 
+        while loqp and task.wait() do 
+            pcall(function()
+                for i,v in pairs(game.Workspace.Projectiles:GetChildren()) do 
+                    if string.find(v.Name, "Waiting") then 
+                        hrp.CFrame = v.CFrame + Vector3.new(0, 3, 0)
+                    end 
+                end 
+            end) 
+        end 
+    end 
+})
+
+section1:AddToggle({
+    Name = "Auto Collect Chests",
+    Value = false, 
+    Flag = "Chests",
+    Callback = function(state)
+        o = state 
+        while o and task.wait(1) do 
+            pcall(function()
+                fireproximityprompt(game.Workspace.Map:FindFirstChild("LootChest").PrimaryPart.LootChestAttachment.LootPrompt)
+            end)
+        end 
+    end 
+})
+
+section1:AddToggle({
+    Name = "Auto Replay", 
+    Value = false, 
+    Flag = "Replay", 
+    Callback = function(state)
+        lopq = state
+        while lopq and task.wait() do 
+            firesignal(plr.PlayerGui.DungeonClear.Buttons.ButtonFrame.ReplayDungeon.MouseButton1Click)
+        end 
+    end 
+})
+
+section1:AddToggle({
+    Name = "Enable DMG Multi?",
+    Value = false, 
+    Flag = "DMG",
+    Callback = function(state)
+        v1 = state 
+    end 
+})
+
+section1:AddSlider({
+    Name = "DMG Muliplier",
+    Flag = "DMGm",
+    Value = 1, 
+    Min = 1, 
+    Max = 500, 
+    Callback = function(val)
+        value1 = val
+    end 
+})
+
+local oldmt551
+oldmt551 = hookmetamethod(game, "__namecall", function(self, ...)
+    local args = {...}
+    local k = {}
+    if v1 and tostring(self.Name) == "MeleeAttack" then 
+        args[1] = 1
+        for i,v in pairs(args[2]) do 
+            for i1,v1 in pairs(v) do 
+                for r = 1, (value1 or 1) do 
+                    table.insert(k, v1) 
+                end 
+            end 
+        end 
+        args[2] = {
+            ["Targets"] = k
+        }
+        return self.FireServer(self, unpack(args))
+    end 
+    return oldmt551(self, ...)
+end)
+
+section1:AddToggle({
+    Name = "Kill Aura",
+    Value = false, 
+    Flag = "Kill Aura", 
+    Callback = function(state)
+        a = state 
+        local b = (getweaponatkspeed(getweapon()) or 1) 
+        while a and task.wait(b) do 
+            pcall(function()
+                if #getallnearby() ~= 0 then 
+                    game:GetService("ReplicatedStorage").Remotes.Action.MeleeAttack:FireServer(1, {["Targets"] = getallnearby()})
+                end 
+            end)
+        end 
+    end 
+})
+
+section1:AddSlider({
+    Name = "Kill Aura Range", 
+    Flag = "kiu",
+    Value = 15, 
+    Min = 5, 
+    Max = 15,
+    Callback = function(amount)
+        q = amount 
+    end 
+})
+
+section1:AddSlider({
+    Name = "KA DMG Multi",
+    Flag = "kadmg",
+    Value = 1,
+    Min = 1, 
+    Max = 500, 
+    Callback = function(amount)
+        amount1 = amount 
+    end 
+})
+
+section1:AddToggle({
+    Name = "Ranged Lock",
+    Value = false,
+    Flag = "Bow?",
+    Callback = function(state)
+        d = state 
+    end
+})
+
+section1:AddToggle({
+    Name = "Draw FOV?",
+    Value = false, 
+    Flag = "Draw?",
+    Callback = function(state)
+        p = state 
+    end 
+})
+
+section1:AddSlider({
+    Name = "Lock FOV", 
+    Flag = "fovf",
+    Value = 180, 
+    Min = 90, 
+    Max = 500, 
+    Callback = function(amount)
+        e = amount 
+    end 
+})
+
+section3:AddToggle({
+    Name = "Auto Sell (LOCK UR ITEMS!)", 
+    Value = false, 
+    Flag = "Sell",
+    Callback = function(state)
+        lopp = state 
+        while lopp and task.wait() do 
+            pcall(function()
+                for i,v in pairs(plr.stats.Inventory:GetChildren()) do
+                    if table.find(kk, tostring(v.Rarity.Value)) then 
+                        game:GetService("ReplicatedStorage").Remotes.UI.MassSell:FireServer({{["Item"] = v, ["Count"] = 1}})
+                    end 
+                end 
+            end) 
+        end 
+    end 
+})
+
+section3:AddDropdown({
+    Name = "Select Rarity (0 = Common)",
+    Flag = "Rarity",
+    Multi = true, 
+    List = {"0", "1", "2", "3", "4", "5", "6"},
+    Callback = function(selected)
+        kk = selected 
+    end 
+})
+
+local oldmt 
+oldmt = hookmetamethod(game, "__namecall", function(self, ...)
+    local args = {...}
+    if d and tostring(self.Name) == "UpdateMouseDirection" then 
+        if getclosestenemytomouse(e) ~= nil then 
+            args[1] = getclosestenemytomouse(e)
+        end 
+        return self.FireServer(self, unpack(args))
+    end 
+    return oldmt(self, ...)
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if p then 
+        showfov.Radius = e
+        showfov.Position = Vector2.new(plr:GetMouse().X, plr:GetMouse().Y + (game:GetService("GuiService").GetGuiInset(game:GetService("GuiService")).Y))
+        showfov.Visible = true 
+    else 
+        showfov.Visible = false 
+    end 
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+if lo then 
+for i,v in pairs(cha:GetDescendants()) do 
+    if v:IsA("BasePart") and v.CanCollide then 
+        v.CanCollide = false 
+    end 
+end
+hrp.Velocity = Vector3.new(0,0,0)
+end 
+end)
+
+pers:LoadFile(_G.UrConfigName)
+
+for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.Idled)) do
+v:Disable()
+end
