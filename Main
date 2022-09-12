@@ -103,8 +103,6 @@ local pers = section2:AddPersistence({
     Name = "Load/Save Config"
 })
 
-pers:LoadFile(_G.UrConfigName)
-
 local function getclosestenemy()
     local closest = nil 
     local maxdist = math.huge
@@ -416,6 +414,10 @@ end
 hrp.Velocity = Vector3.new(0,0,0)
 end 
 end)
+
+wait(15)
+
+pers:LoadFile(_G.UrConfigName)
 
 for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.Idled)) do
 v:Disable()
