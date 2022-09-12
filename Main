@@ -103,6 +103,8 @@ local pers = section2:AddPersistence({
     Name = "Load/Save Config"
 })
 
+pers:LoadFile(_G.UrConfigName)
+
 local function getclosestenemy()
     local closest = nil 
     local maxdist = math.huge
@@ -168,7 +170,7 @@ local function getweaponatkspeed(weapon)
 end
 
 section1:AddToggle({
-    Name = "Auto Farm (Bad Unless AFK)",
+    Name = "Auto Farm (Bad)",
     Value = false, 
     Flag = "Auto",
     Callback = function(state)
@@ -184,7 +186,7 @@ section1:AddToggle({
 })
 
 section1:AddToggle({
-    Name = "Pathfinding AutoFarm (Bad)",
+    Name = "Pathfinding AutoFarm",
     Value = false, 
     Flag = "PATH",
     Callback = function(state)
@@ -238,7 +240,9 @@ section1:AddToggle({
     Callback = function(state)
         lopq = state
         while lopq and task.wait() do 
-            firesignal(plr.PlayerGui.DungeonClear.Buttons.ButtonFrame.ReplayDungeon.MouseButton1Click)
+            pcall(function() 
+                firesignal(plr.PlayerGui.DungeonClear.Buttons.ButtonFrame.ReplayDungeon.MouseButton1Click)
+            end)
         end 
     end 
 })
@@ -412,10 +416,6 @@ end
 hrp.Velocity = Vector3.new(0,0,0)
 end 
 end)
-
-wait(5)
-
-pers:LoadFile(_G.UrConfigName)
 
 for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.Idled)) do
 v:Disable()
