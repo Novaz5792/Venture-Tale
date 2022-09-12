@@ -107,7 +107,7 @@ local function getclosestenemy()
     local closest = nil 
     local maxdist = math.huge
     for i,v in pairs(game.Workspace.NPCS:GetChildren()) do 
-        if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
+        if (not string.find(v.Name, "DPS")) and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
             local magnitude = (v.HumanoidRootPart.Position - hrp.Position).Magnitude 
             if magnitude < maxdist then 
                 maxdist = magnitude 
@@ -122,7 +122,7 @@ local function getclosestenemytomouse(FOV)
     local closest = nil 
     local maxdist = math.huge
     for i,v in pairs(game.Workspace.NPCS:GetChildren()) do 
-        if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
+        if (not string.find(v.Name, "DPS")) and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
             local screenpoint, onscreen = game.Workspace.CurrentCamera:WorldToScreenPoint(v.HumanoidRootPart.Position)
             if onscreen then 
                 local magnitude = (Vector2.new(plr:GetMouse().X, plr:GetMouse().Y) - Vector2.new(screenpoint.X, screenpoint.Y)).Magnitude
@@ -139,7 +139,7 @@ end
 local function getallnearby()
     local table1 = {}
     for i,v in pairs(game.Workspace.NPCS:GetChildren()) do 
-        if (not string.find(v.Name, "God")) and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
+        if (not string.find(v.Name, "DPS")) and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then 
             local magnitude = (v.HumanoidRootPart.Position - hrp.Position).Magnitude 
             if magnitude < (q or 15) then 
                 for i = 1, (amount1 or 1) do 
@@ -257,7 +257,7 @@ section1:AddSlider({
     Flag = "DMGm",
     Value = 1, 
     Min = 1, 
-    Max = 500, 
+    Max = 100, 
     Callback = function(val)
         value1 = val
     end 
@@ -317,7 +317,7 @@ section1:AddSlider({
     Flag = "kadmg",
     Value = 1,
     Min = 1, 
-    Max = 500, 
+    Max = 100, 
     Callback = function(amount)
         amount1 = amount 
     end 
@@ -412,6 +412,8 @@ end
 hrp.Velocity = Vector3.new(0,0,0)
 end 
 end)
+
+wait(5)
 
 pers:LoadFile(_G.UrConfigName)
 
