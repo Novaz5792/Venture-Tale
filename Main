@@ -240,7 +240,7 @@ section1:AddToggle({
         lopq = state
         while lopq and task.wait() do 
             pcall(function() 
-	    	if plr.PlayerGui.DungeonClear.DungeonClearLabel.Visible then 
+	    	if plr.PlayerGui:FindFirstChild("DungeonClear") and plr.PlayerGui.DungeonClear:FindFirstChild("DungeonClearLabel") and plr.PlayerGui.DungeonClear.DungeonClearLabel.Visible then 
 		    game.ReplicatedStorage.UI.EndDungeon.EndOfDungeonVote:FireServer("ReplayDungeon")
 		end
             end)
