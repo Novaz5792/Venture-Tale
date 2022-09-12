@@ -244,7 +244,7 @@ section1:AddToggle({
 plr.PlayerGui.DungeonClear.DungeonClearLabel:GetPropertyChangedSignal("Visible"):Connect(function()
     if lopq then 
         wait(5)
-        game.ReplicatedStorage.UI.EndDungeon.EndOfDungeonVote:FireServer("ReplayDungeon")
+        game.ReplicatedStorage.Remotes.UI.EndDungeon.EndOfDungeonVote:FireServer("ReplayDungeon")
     end 
 end)
 
