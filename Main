@@ -415,7 +415,7 @@ hrp.Velocity = Vector3.new(0,0,0)
 end 
 end)
 
-wait(15)
+wait(5)
 
 pers:LoadFile(_G.UrConfigName)
 
